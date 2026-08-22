@@ -866,12 +866,28 @@ a.mini-list__row:hover {
   white-space: pre-wrap;
 }
 
+.enquiry__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.enquiry__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .enquiry__listing {
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
   color: var(--ink-muted);
+  margin: 0;
 }
 
 .pagination {

@@ -1,19 +1,49 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useToast } from '../components/toast';
 import { EmptyState, ErrorState, Pagination, Spinner } from '../components/ui';
 import { api } from '../lib/api';
 import { formatDateTime, formatRelative } from '../lib/format';
 import { usePrefs } from '../lib/prefs';
-import { useAsync } from '../lib/useAsync';
+import { errorMessage, useAsync } from '../lib/useAsync';
 
 export function Enquiries() {
   const [params, setParams] = useSearchParams();
   const { lang } = usePrefs();
+  const toast = useToast();
   const page = Math.max(1, Number(params.get('page') ?? 1) || 1);
   const [search, setSearch] = useState('');
+  const [updating, setUpdating] = useState<string | null>(null);
 
   const load = useCallback(() => api.enquiries({ page, limit: 20 }), [page]);
-  const { data, loading, error, reload } = useAsync(load, [page]);
+  const { data, loading, error, reload, setData } = useAsync(load, [page]);
+
+  async function toggleContacted(id: string, contacted: boolean) {
+    setUpdating(id);
+    try {
+      const updated = await api.setEnquiryContacted(id, contacted);
+      setData((current) =>
+        current
+          ? {
+              ...current,
+              data: current.data.map((e) =>
+                e.id === id
+                  ? { ...e, contacted: updated.contacted, contactedAt: updated.contactedAt }
+                  : e,
+              ),
+            }
+          : current,
+      );
+      toast.push(
+        'success',
+        contacted ? 'Marked as contacted.' : 'Marked as not contacted.',
+      );
+    } catch (err) {
+      toast.push('error', errorMessage(err));
+    } finally {
+      setUpdating(null);
+    }
+  }
 
   const rows = useMemo(() => {
     const list = data?.data ?? [];
@@ -89,27 +119,53 @@ export function Enquiries() {
                         </span>
                       </span>
                     </span>
-                    <time
-                      className="muted nowrap"
-                      dateTime={enquiry.createdAt}
-                      title={formatDateTime(enquiry.createdAt)}
-                    >
-                      {formatRelative(enquiry.createdAt)}
-                    </time>
+                    <span className="enquiry__meta">
+                      <span
+                        className={`badge badge--${enquiry.contacted ? 'approved' : 'pending'}`}
+                        title={
+                          enquiry.contacted && enquiry.contactedAt
+                            ? `Contacted ${formatDateTime(enquiry.contactedAt)}`
+                            : undefined
+                        }
+                      >
+                        {enquiry.contacted ? 'Contacted' : 'Not contacted'}
+                      </span>
+                      <time
+                        className="muted nowrap"
+                        dateTime={enquiry.createdAt}
+                        title={formatDateTime(enquiry.createdAt)}
+                      >
+                        {formatRelative(enquiry.createdAt)}
+                      </time>
+                    </span>
                   </div>
 
                   <p className="enquiry__message" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
                     {enquiry.message}
                   </p>
 
-                  <p className="enquiry__listing">
-                    <span className="badge badge--neutral">
-                      #{enquiry.listing.listingNumber}
-                    </span>
-                    <span dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-                      {title} — {location}
-                    </span>
-                  </p>
+                  <div className="enquiry__footer">
+                    <p className="enquiry__listing">
+                      <span className="badge badge--neutral">
+                        #{enquiry.listing.listingNumber}
+                      </span>
+                      <span dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+                        {title} — {location}
+                      </span>
+                    </p>
+                    <button
+                      type="button"
+                      className={`btn btn--sm ${enquiry.contacted ? 'btn--secondary' : 'btn--primary'}`}
+                      disabled={updating === enquiry.id}
+                      onClick={() => toggleContacted(enquiry.id, !enquiry.contacted)}
+                    >
+                      {updating === enquiry.id
+                        ? 'Saving…'
+                        : enquiry.contacted
+                          ? 'Mark not contacted'
+                          : 'Mark contacted'}
+                    </button>
+                  </div>
                 </li>
               );
             })}

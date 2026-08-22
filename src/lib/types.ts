@@ -95,6 +95,8 @@ export interface Enquiry {
   phone: string;
   email: string | null;
   message: string;
+  contacted: boolean;
+  contactedAt: string | null;
   listingId: string;
   listing: EnquiryListing;
   createdAt: string;

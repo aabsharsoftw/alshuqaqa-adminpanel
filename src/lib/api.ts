@@ -144,6 +144,12 @@ export const api = {
   enquiries: (params: { page?: number; limit?: number }) =>
     request<Paginated<Enquiry>>('/admin/enquiries', { query: { ...params } }),
 
+  setEnquiryContacted: (id: string, contacted: boolean) =>
+    request<Enquiry>(`/admin/enquiries/${id}/contacted`, {
+      method: 'PATCH',
+      body: { contacted },
+    }),
+
   categories: () => request<Category[]>('/categories'),
 
   createCategory: (name: string) =>
