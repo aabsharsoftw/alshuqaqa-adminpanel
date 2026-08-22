@@ -5,11 +5,13 @@ import { Layout } from './components/Layout';
 import { PrefsProvider } from './components/PrefsProvider';
 import { ToastProvider } from './components/ToastProvider';
 import { Spinner } from './components/ui';
+import { Categories } from './pages/Categories';
 import { Dashboard } from './pages/Dashboard';
 import { Enquiries } from './pages/Enquiries';
 import { Landlords } from './pages/Landlords';
 import { Listings } from './pages/Listings';
 import { Login } from './pages/Login';
+import { Privacy, PublicPrivacy } from './pages/Privacy';
 
 function Routing() {
   const { user, loading } = useAuth();
@@ -22,15 +24,24 @@ function Routing() {
     );
   }
 
-  if (!user) return <Login />;
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/privacy" element={<PublicPrivacy />} />
+        <Route path="*" element={<Login />} />
+      </Routes>
+    );
+  }
 
   return (
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
         <Route path="listings" element={<Listings />} />
+        <Route path="categories" element={<Categories />} />
         <Route path="landlords" element={<Landlords />} />
         <Route path="enquiries" element={<Enquiries />} />
+        <Route path="privacy" element={<Privacy />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

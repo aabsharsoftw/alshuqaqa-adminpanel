@@ -1,4 +1,5 @@
 import type {
+  Category,
   Enquiry,
   Lang,
   Listing,
@@ -142,4 +143,12 @@ export const api = {
 
   enquiries: (params: { page?: number; limit?: number }) =>
     request<Paginated<Enquiry>>('/admin/enquiries', { query: { ...params } }),
+
+  categories: () => request<Category[]>('/categories'),
+
+  createCategory: (name: string) =>
+    request<Category>('/admin/categories', { method: 'POST', body: { name } }),
+
+  deleteCategory: (id: string) =>
+    request<{ success: boolean }>(`/admin/categories/${id}`, { method: 'DELETE' }),
 };

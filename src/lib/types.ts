@@ -35,6 +35,16 @@ export interface ListingLandlord {
   phone: string | null;
 }
 
+export interface Category {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  createdAt: string;
+  updatedAt: string;
+  /** Localized projection added by the backend for the requested language. */
+  name: string;
+}
+
 export interface Listing {
   id: string;
   listingNumber: number;
@@ -48,6 +58,8 @@ export interface Listing {
   status: ListingStatus;
   landlordId: string;
   landlord: ListingLandlord;
+  categoryId: string | null;
+  category: Category | null;
   images: ListingImage[];
   createdAt: string;
   updatedAt: string;

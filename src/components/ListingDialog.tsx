@@ -176,6 +176,10 @@ export function ListingDialog({
               </dd>
             </div>
             <div>
+              <dt>Category</dt>
+              <dd>{listing.category ? listing.category.name : <span className="muted">—</span>}</dd>
+            </div>
+            <div>
               <dt>Landlord</dt>
               <dd>
                 {listing.landlord.name}

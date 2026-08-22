@@ -6,6 +6,7 @@ import { usePrefs } from '../lib/prefs';
 const NAV = [
   { to: '/', label: 'Dashboard', end: true, icon: '◧' },
   { to: '/listings', label: 'Listings', end: false, icon: '▤' },
+  { to: '/categories', label: 'Categories', end: false, icon: '▦' },
   { to: '/landlords', label: 'Landlords', end: false, icon: '◍' },
   { to: '/enquiries', label: 'Enquiries', end: false, icon: '✉' },
 ];
@@ -59,6 +60,13 @@ export function Layout() {
           <button type="button" className="btn btn--ghost btn--sm" onClick={logout}>
             Sign out
           </button>
+          <NavLink
+            to="/privacy"
+            className="btn btn--ghost btn--sm"
+            onClick={() => setNavOpen(false)}
+          >
+            Privacy Policy
+          </NavLink>
         </div>
       </aside>
 

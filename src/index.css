@@ -1226,3 +1226,33 @@ a.mini-list__row:hover {
     width: 100%;
   }
 }
+
+/* ---------- Legal / prose ---------- */
+
+.legal {
+  padding: 22px;
+  color: var(--ink-secondary);
+  line-height: 1.65;
+}
+
+.legal h2 {
+  color: var(--ink);
+  font-size: 16px;
+  margin: 24px 0 8px;
+}
+
+.legal h2:first-of-type {
+  margin-top: 12px;
+}
+
+.legal p {
+  margin: 0 0 12px;
+}
+
+.legal ul {
+  margin: 0 0 12px;
+  padding-inline-start: 20px;
+  display: grid;
+  gap: 6px;
+}
+
