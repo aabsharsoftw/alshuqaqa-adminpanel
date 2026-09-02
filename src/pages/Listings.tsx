@@ -19,12 +19,11 @@ const TABS: { value: ListingStatus | 'ALL'; label: string }[] = [
   { value: 'PENDING', label: 'Pending' },
   { value: 'APPROVED', label: 'Approved' },
   { value: 'REJECTED', label: 'Rejected' },
-  { value: 'DRAFT', label: 'Drafts' },
   { value: 'ALL', label: 'All' },
 ];
 
 function isStatus(value: string | null): value is ListingStatus {
-  return value === 'DRAFT' || value === 'PENDING' || value === 'APPROVED' || value === 'REJECTED';
+  return value === 'PENDING' || value === 'APPROVED' || value === 'REJECTED';
 }
 
 export function Listings() {

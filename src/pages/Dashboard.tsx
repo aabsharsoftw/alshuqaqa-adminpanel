@@ -9,15 +9,14 @@ import { useAsync } from '../lib/useAsync';
 
 /** One row per status so meta.total gives the count without fetching all rows. */
 async function loadOverview() {
-  const [pending, approved, rejected, drafts, landlords, enquiries] = await Promise.all([
+  const [pending, approved, rejected, landlords, enquiries] = await Promise.all([
     api.listings({ status: 'PENDING', page: 1, limit: 5 }),
     api.listings({ status: 'APPROVED', page: 1, limit: 1 }),
     api.listings({ status: 'REJECTED', page: 1, limit: 1 }),
-    api.listings({ status: 'DRAFT', page: 1, limit: 1 }),
     api.landlords(),
     api.enquiries({ page: 1, limit: 5 }),
   ]);
-  return { pending, approved, rejected, drafts, landlords, enquiries };
+  return { pending, approved, rejected, landlords, enquiries };
 }
 
 export function Dashboard() {
@@ -54,13 +53,6 @@ export function Dashboard() {
       value: data.rejected.meta.total,
       hint: 'Declined submissions',
       to: '/listings?status=REJECTED',
-      attention: false,
-    },
-    {
-      label: 'Drafts',
-      value: data.drafts.meta.total,
-      hint: 'Not yet submitted',
-      to: '/listings?status=DRAFT',
       attention: false,
     },
     {
