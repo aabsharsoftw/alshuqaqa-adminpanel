@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { useToast } from '../components/toast';
 import { EmptyState, ErrorState, Spinner } from '../components/ui';
 import { api } from '../lib/api';
@@ -15,7 +15,7 @@ export function Places() {
   const [stateName, setStateName] = useState('');
   const [creatingState, setCreatingState] = useState(false);
   const [deletingState, setDeletingState] = useState<string | null>(null);
-  const [selected, setSelected] = useState<State | null>(null);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   const loadStates = useCallback(() => api.states(), []);
   // `lang` is not read here — it rides Accept-Language — but changing it must
@@ -53,7 +53,7 @@ export function Places() {
       states.setData((current) =>
         current ? current.filter((s) => s.id !== state.id) : current,
       );
-      if (selected?.id === state.id) setSelected(null);
+      if (openId === state.id) setOpenId(null);
       toast.push('success', `State “${state.nameEn}” deleted.`);
     } catch (err) {
       toast.push('error', errorMessage(err));
@@ -123,48 +123,54 @@ export function Places() {
                 </tr>
               </thead>
               <tbody>
-                {stateRows.map((state) => (
-                  <tr
-                    key={state.id}
-                    className={selected?.id === state.id ? 'is-selected' : undefined}
-                  >
-                    <td>
-                      <strong>{state.nameEn}</strong>
-                    </td>
-                    <td dir="rtl" lang="ar">
-                      {state.nameAr}
-                    </td>
-                    <td className="nowrap muted">{formatDate(state.createdAt)}</td>
-                    <td>
-                      <div className="row-actions">
-                        <button
-                          type="button"
-                          className="btn btn--secondary btn--sm"
-                          onClick={() =>
-                            setSelected((s) => (s?.id === state.id ? null : state))
-                          }
-                        >
-                          {selected?.id === state.id ? 'Hide cities' : 'Manage cities'}
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn--danger-ghost btn--sm"
-                          disabled={deletingState === state.id}
-                          onClick={() => removeState(state)}
-                        >
-                          {deletingState === state.id ? 'Deleting…' : 'Delete'}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {stateRows.map((state) => {
+                  const open = openId === state.id;
+                  return (
+                    <Fragment key={state.id}>
+                      <tr className={open ? 'is-selected' : undefined}>
+                        <td>
+                          <strong>{state.nameEn}</strong>
+                        </td>
+                        <td dir="rtl" lang="ar">
+                          {state.nameAr}
+                        </td>
+                        <td className="nowrap muted">{formatDate(state.createdAt)}</td>
+                        <td>
+                          <div className="row-actions">
+                            <button
+                              type="button"
+                              className="btn btn--secondary btn--sm"
+                              aria-expanded={open}
+                              onClick={() => setOpenId(open ? null : state.id)}
+                            >
+                              {open ? 'Hide cities' : 'Manage cities'}
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn--danger-ghost btn--sm"
+                              disabled={deletingState === state.id}
+                              onClick={() => removeState(state)}
+                            >
+                              {deletingState === state.id ? 'Deleting…' : 'Delete'}
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      {open && (
+                        <tr className="subrow">
+                          <td colSpan={4}>
+                            <CitiesPanel state={state} />
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
       </section>
-
-      {selected && <CitiesPanel state={selected} />}
     </>
   );
 }
@@ -221,12 +227,11 @@ function CitiesPanel({ state }: { state: State }) {
   const rows = data ?? [];
 
   return (
-    <section className="card">
-      <header className="page-head">
-        <div>
-          <h2>Cities in {state.nameEn}</h2>
-        </div>
-      </header>
+    <div className="cities-panel">
+      <div className="cities-panel__head">
+        <strong>Cities in {state.nameEn}</strong>
+        {!loading && !error && <span className="muted">{rows.length} total</span>}
+      </div>
 
       <form className="row-actions" onSubmit={create}>
         <input
@@ -239,7 +244,7 @@ function CitiesPanel({ state }: { state: State }) {
         />
         <button
           type="submit"
-          className="btn btn--primary"
+          className="btn btn--primary btn--sm"
           disabled={creating || !name.trim()}
         >
           {creating ? 'Adding…' : 'Add city'}
@@ -294,6 +299,6 @@ function CitiesPanel({ state }: { state: State }) {
           </table>
         </div>
       )}
-    </section>
+    </div>
   );
 }

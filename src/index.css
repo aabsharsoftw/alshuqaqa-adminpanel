@@ -716,6 +716,35 @@ img {
   box-shadow: inset 3px 0 0 var(--accent, #6366f1);
 }
 
+/* Inline "manage cities" panel expanded under its state row. */
+.table tbody tr.subrow:hover {
+  background: transparent;
+}
+
+.table tbody tr.subrow > td {
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.cities-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 16px 20px;
+  background: var(--panel-alt);
+  box-shadow: inset 3px 0 0 var(--accent, #6366f1);
+}
+
+.cities-panel__head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.cities-panel .table {
+  background: var(--panel);
+}
+
 .table__actions-head {
   text-align: right;
 }
