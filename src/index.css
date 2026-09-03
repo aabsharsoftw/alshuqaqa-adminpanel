@@ -578,6 +578,17 @@ img {
   margin-bottom: 14px;
 }
 
+/* Listings state/city filter bar: left-aligned, sits above the results card. */
+.listings-filters {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.listings-filters .input {
+  max-width: 220px;
+}
+
 .tab {
   padding: 7px 14px;
   border: 1px solid var(--border);
@@ -698,6 +709,11 @@ img {
 
 .table tbody tr:hover {
   background: var(--panel-alt);
+}
+
+.table tbody tr.is-selected {
+  background: var(--panel-alt);
+  box-shadow: inset 3px 0 0 var(--accent, #6366f1);
 }
 
 .table__actions-head {

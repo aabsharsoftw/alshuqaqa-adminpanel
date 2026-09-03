@@ -45,6 +45,20 @@ export interface Category {
   name: string;
 }
 
+export interface State {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  createdAt: string;
+  updatedAt: string;
+  /** Localized projection added by the backend for the requested language. */
+  name: string;
+}
+
+export interface City extends State {
+  stateId: string;
+}
+
 export interface Listing {
   id: string;
   listingNumber: number;
@@ -60,6 +74,10 @@ export interface Listing {
   landlord: ListingLandlord;
   categoryId: string | null;
   category: Category | null;
+  stateId: string | null;
+  state: State | null;
+  cityId: string | null;
+  city: City | null;
   images: ListingImage[];
   createdAt: string;
   updatedAt: string;
@@ -67,6 +85,8 @@ export interface Listing {
   title: string;
   location: string;
   description: string;
+  /** "<area>, <city>, <state>" composed by the backend. */
+  fullAddress: string;
   language: Lang;
 }
 

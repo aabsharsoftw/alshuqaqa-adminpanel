@@ -1,5 +1,6 @@
 import type {
   Category,
+  City,
   Enquiry,
   Lang,
   Listing,
@@ -7,6 +8,7 @@ import type {
   Landlord,
   LoginResponse,
   Paginated,
+  State,
   User,
 } from './types';
 
@@ -121,8 +123,13 @@ export const api = {
 
   logout: () => request<{ message: string }>('/auth/logout', { method: 'POST' }),
 
-  listings: (params: { status?: ListingStatus; page?: number; limit?: number }) =>
-    request<Paginated<Listing>>('/admin/listings', { query: { ...params } }),
+  listings: (params: {
+    status?: ListingStatus;
+    stateId?: string;
+    cityId?: string;
+    page?: number;
+    limit?: number;
+  }) => request<Paginated<Listing>>('/admin/listings', { query: { ...params } }),
 
   approveListing: (id: string) =>
     request<Listing>(`/admin/listings/${id}/approve`, { method: 'PATCH' }),
@@ -157,4 +164,20 @@ export const api = {
 
   deleteCategory: (id: string) =>
     request<{ success: boolean }>(`/admin/categories/${id}`, { method: 'DELETE' }),
+
+  states: () => request<State[]>('/states'),
+
+  cities: (stateId: string) => request<City[]>(`/states/${stateId}/cities`),
+
+  createState: (name: string) =>
+    request<State>('/admin/states', { method: 'POST', body: { name } }),
+
+  deleteState: (id: string) =>
+    request<{ success: boolean }>(`/admin/states/${id}`, { method: 'DELETE' }),
+
+  createCity: (name: string, stateId: string) =>
+    request<City>('/admin/cities', { method: 'POST', body: { name, stateId } }),
+
+  deleteCity: (id: string) =>
+    request<{ success: boolean }>(`/admin/cities/${id}`, { method: 'DELETE' }),
 };

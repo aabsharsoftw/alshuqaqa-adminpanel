@@ -34,22 +34,65 @@ export function Listings() {
   const statusParam = params.get('status');
   const status = isStatus(statusParam) ? statusParam : statusParam === 'ALL' ? 'ALL' : 'PENDING';
   const page = Math.max(1, Number(params.get('page') ?? 1) || 1);
+  const stateId = params.get('state') ?? '';
+  const cityId = params.get('city') ?? '';
 
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Listing | null>(null);
   const [approving, setApproving] = useState<string | null>(null);
 
+  const loadStates = useCallback(() => api.states(), []);
+  const { data: states } = useAsync(loadStates, [lang]);
+
+  const loadCities = useCallback(
+    () => (stateId ? api.cities(stateId) : Promise.resolve([])),
+    [stateId],
+  );
+  const { data: cities } = useAsync(loadCities, [stateId, lang]);
+
   const load = useCallback(
-    () => api.listings({ status: status === 'ALL' ? undefined : status, page, limit: 20 }),
-    [status, page],
+    () =>
+      api.listings({
+        status: status === 'ALL' ? undefined : status,
+        stateId: stateId || undefined,
+        cityId: cityId || undefined,
+        page,
+        limit: 20,
+      }),
+    [status, stateId, cityId, page],
   );
   // `lang` is not read here — it travels as Accept-Language — but changing it
   // must refetch, so it stays in the effect deps.
-  const { data, loading, error, reload, setData } = useAsync(load, [status, page, lang]);
+  const { data, loading, error, reload, setData } = useAsync(load, [
+    status,
+    stateId,
+    cityId,
+    page,
+    lang,
+  ]);
 
   const setParam = (next: Record<string, string>) => {
     const merged = new URLSearchParams(params);
     for (const [key, value] of Object.entries(next)) merged.set(key, value);
+    setParams(merged, { replace: true });
+  };
+
+  // State/city are dependent: changing the state clears the city, and an empty
+  // value removes the param entirely ("All").
+  const changeState = (next: string) => {
+    const merged = new URLSearchParams(params);
+    if (next) merged.set('state', next);
+    else merged.delete('state');
+    merged.delete('city');
+    merged.set('page', '1');
+    setParams(merged, { replace: true });
+  };
+
+  const changeCity = (next: string) => {
+    const merged = new URLSearchParams(params);
+    if (next) merged.set('city', next);
+    else merged.delete('city');
+    merged.set('page', '1');
     setParams(merged, { replace: true });
   };
 
@@ -60,7 +103,7 @@ export function Listings() {
     return list.filter((listing) =>
       [
         listing.title,
-        listing.location,
+        listing.fullAddress || listing.location,
         listing.landlord.name,
         listing.landlord.email,
         String(listing.listingNumber),
@@ -134,6 +177,36 @@ export function Listings() {
         ))}
       </div>
 
+      <div className="row-actions listings-filters">
+        <select
+          className="input"
+          aria-label="Filter by state"
+          value={stateId}
+          onChange={(e) => changeState(e.target.value)}
+        >
+          <option value="">All states</option>
+          {(states ?? []).map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+        <select
+          className="input"
+          aria-label="Filter by city"
+          value={cityId}
+          onChange={(e) => changeCity(e.target.value)}
+          disabled={!stateId}
+        >
+          <option value="">{stateId ? 'All cities' : 'All cities (pick a state)'}</option>
+          {(cities ?? []).map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <section className="card">
         {loading && <Spinner label="Loading listings" />}
         {!loading && error && <ErrorState message={error} onRetry={reload} />}
@@ -184,7 +257,7 @@ export function Listings() {
                         <span className="listing-cell__text">
                           <strong dir={lang === 'ar' ? 'rtl' : 'ltr'}>{listing.title}</strong>
                           <span dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-                            #{listing.listingNumber} · {listing.location}
+                            #{listing.listingNumber} · {listing.fullAddress || listing.location}
                           </span>
                         </span>
                       </button>

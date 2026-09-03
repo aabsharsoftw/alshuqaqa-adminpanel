@@ -156,14 +156,28 @@ export function ListingDialog({
               </dd>
             </div>
             <div>
-              <dt>Location (EN)</dt>
+              <dt>Area (EN)</dt>
               <dd>{listing.locationEn}</dd>
             </div>
             <div>
-              <dt>Location (AR)</dt>
+              <dt>Area (AR)</dt>
               <dd dir="rtl" lang="ar">
                 {listing.locationAr}
               </dd>
+            </div>
+            <div>
+              <dt>City / State</dt>
+              <dd>
+                {listing.city || listing.state ? (
+                  [listing.city?.name, listing.state?.name].filter(Boolean).join(', ')
+                ) : (
+                  <span className="muted">—</span>
+                )}
+              </dd>
+            </div>
+            <div>
+              <dt>Full address</dt>
+              <dd>{listing.fullAddress || <span className="muted">—</span>}</dd>
             </div>
             <div>
               <dt>Description (EN)</dt>

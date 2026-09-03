@@ -11,6 +11,7 @@ import { Enquiries } from './pages/Enquiries';
 import { Landlords } from './pages/Landlords';
 import { Listings } from './pages/Listings';
 import { Login } from './pages/Login';
+import { Places } from './pages/Places';
 import { Privacy, PublicPrivacy } from './pages/Privacy';
 
 function Routing() {
@@ -39,6 +40,7 @@ function Routing() {
         <Route index element={<Dashboard />} />
         <Route path="listings" element={<Listings />} />
         <Route path="categories" element={<Categories />} />
+        <Route path="places" element={<Places />} />
         <Route path="landlords" element={<Landlords />} />
         <Route path="enquiries" element={<Enquiries />} />
         <Route path="privacy" element={<Privacy />} />

@@ -7,6 +7,7 @@ const NAV = [
   { to: '/', label: 'Dashboard', end: true, icon: '◧' },
   { to: '/listings', label: 'Listings', end: false, icon: '▤' },
   { to: '/categories', label: 'Categories', end: false, icon: '▦' },
+  { to: '/places', label: 'Places', end: false, icon: '◈' },
   { to: '/landlords', label: 'Landlords', end: false, icon: '◍' },
   { to: '/enquiries', label: 'Enquiries', end: false, icon: '✉' },
 ];
